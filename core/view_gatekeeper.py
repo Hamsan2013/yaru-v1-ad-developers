@@ -3,14 +3,14 @@ import json
 from PIL import Image
 import numpy as np
 
-def run_yaru_gatekeeper(input_folder="input_images"):
+def run_yaru_gatekeeper(input_folder="input"):
     print("🤖 [Yaru 1.0] Starting Orthographic Orientation Validation...")
     
     valid_views = ['front', 'back', 'left', 'right', 'top', 'bottom']
     discovered_views = {}
     
     if not os.path.exists(input_folder):
-        print(f"⚠️ Directory '/{input_folder}' not found. Creating placeholder path...")
+        print(f"⚠️ Directory '/{input_folder}' not found. Creating path...")
         os.makedirs(input_folder, exist_ok=True)
         return False
 
@@ -22,8 +22,8 @@ def run_yaru_gatekeeper(input_folder="input_images"):
     total_views = len(discovered_views)
     print(f"📊 Matrix Scanner localized {total_views} explicit orientation views.")
 
-    if total_views not in [2, 4, 6]:
-        print(f"❌ Error: Yaru 1.0 requires exactly 2, 4, or 6 orthographic views. Found: {total_views}")
+    if total_views == 0:
+        print(f"❌ Error: No valid orthographic images found in /{input_folder}. Ensure file is named 'front.png'.")
         return False
 
     manifest = {
@@ -40,11 +40,11 @@ def run_yaru_gatekeeper(input_folder="input_images"):
                 pixel_matrix = np.array(img_rgb)
                 corner = pixel_matrix[0, 0]
                 
-                is_black = np.all(corner <= 8)
-                is_white = np.all(corner >= 247)
+                is_black = np.all(corner <= 15)
+                is_white = np.all(corner >= 240)
                 
                 if not (is_black or is_white):
-                    print(f"❌ Rule Violation: '{orientation}' background is not solid white or black.")
+                    print(f"❌ Rule Violation: '{orientation}' background is not solid white or black. Corner: {corner}")
                     return False
                 
                 bg_mode = "SOLID_BLACK" if is_black else "SOLID_WHITE"
@@ -67,4 +67,4 @@ def run_yaru_gatekeeper(input_folder="input_images"):
 
 if __name__ == "__main__":
     run_yaru_gatekeeper()
-  
+    
