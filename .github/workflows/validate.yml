@@ -31,17 +31,11 @@ jobs:
       run: |
         python core/mesh_generator.py
 
-    - name: Execute Export Environmental Bridge
-      run: |
-        python adapters/execution_bridge.py
-
-    - name: Archive Validated 3D Models and Inference Package
+    - name: Archive Validated 3D Models
       if: success()
       uses: actions/upload-artifact@v4
       with:
         name: yaru-final-3d-asset-bundle
-        path: |
-          output_models/
-          telemetry/
+        path: output_models/
         retention-days: 5
         
